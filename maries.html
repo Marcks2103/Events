@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Espace des mariés</title>
+<style>
+:root{--bg:#FBFBF8;--ink:#1D2A26;--mute:#66726D;--line:#E4E3DC;--panel:#F1F1EB}
+@media (prefers-color-scheme:dark){:root{--bg:#121A17;--ink:#ECEBE4;--mute:#9AA7A1;--line:#2A3631;--panel:#1A2420}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 18px 60px}h1{font-weight:500;font-size:1.6rem}h2{font-weight:500;font-size:1.2rem;margin:30px 0 10px}
+input,select,button,textarea{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+button{cursor:pointer;background:var(--ink);color:var(--bg);border:0;border-radius:999px;width:auto;padding:11px 20px}
+button.l{background:transparent;color:var(--ink);border:1px solid var(--line);padding:6px 12px;font-size:.85rem}button.danger{background:#B3261E;color:#fff}
+label{display:grid;gap:4px;font-size:.9rem}textarea{min-height:130px}
+.box{border:1px solid var(--line);background:var(--panel);padding:14px;display:grid;gap:8px;margin-bottom:10px}.box p{margin:0;color:var(--mute);font-size:.92rem}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:9px 0;color:var(--mute);font-size:.92rem}.row b{display:block;color:var(--ink);font-weight:500}
+.err{color:#B3261E}.ok{color:#2F7D4F}.tot{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.tot div{border:1px solid var(--line);background:var(--panel);padding:10px}.tot b{display:block;font-size:1.5rem;font-weight:500}
+.th{display:inline-block;margin:4px;text-align:center}.th img{display:block;width:84px;height:84px;object-fit:cover;border-radius:6px}.th button{padding:4px 10px;font-size:.78rem;margin-top:4px}
+[hidden]{display:none!important}
+</style></head><body><main>
+<h1>Espace des mariés</h1>
+
+<div id="login" class="box" hidden>
+ <b id="lt">Connexion</b>
+ <input id="em" type="email" placeholder="E-mail" autocomplete="username">
+ <input id="pw" type="password" placeholder="Mot de passe (8 caractères minimum)" autocomplete="current-password">
+ <button id="go">Se connecter</button>
+ <button class="l" id="mode" type="button">Pas encore de compte ? Créer un compte</button>
+ <button class="l" id="forgot" type="button">Mot de passe oublié</button>
+ <div id="lerr" class="err" role="alert"></div>
+</div>
+
+<div id="rec" class="box" hidden>
+ <b>Nouveau mot de passe</b><input id="rp" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password">
+ <button id="rgo">Enregistrer</button><div id="rerr" class="err" role="alert"></div>
+</div>
+
+<div id="app" hidden>
+ <button class="l" id="out">Se déconnecter</button> <button class="l" id="csv">Exporter la liste (CSV)</button>
+ <h2>Style de l’invitation</h2>
+ <select id="sty"><option value="">Élégant et épuré</option><option value="dore.html">Chaud et doré</option><option value="enveloppe.html">Romantique, enveloppe</option></select>
+ <p class="box" id="gen"></p>
+ <h2>Informations du mariage</h2>
+ <div class="box">
+  <input id="eb" placeholder="Prénom de la mariée"><input id="eg" placeholder="Prénom du marié">
+  <label>Date et heure<input id="ed" type="datetime-local"></label>
+  <input id="ev" placeholder="Nom de la salle"><input id="ea" placeholder="Adresse"><input id="ec" placeholder="Ville"><input id="edl" placeholder="Répondre avant le (ex. 12 août 2027)">
+  <input id="c1n" placeholder="Contact 1, nom"><input id="c1p" placeholder="Contact 1, téléphone"><input id="c2n" placeholder="Contact 2, nom"><input id="c2p" placeholder="Contact 2, téléphone">
+  <label>Programme, une ligne par moment : heure | titre | description<textarea id="pg" placeholder="16:00 | Accueil des invités | Installation et rafraîchissements"></textarea></label>
+  <label>Photos des mariés (les 3 premières ouvrent l’invitation)<input id="pi" type="file" accept="image/*" multiple></label>
+  <div id="pl"></div>
+  <button id="se">Enregistrer les informations</button><div id="em2" role="status"></div>
+ </div>
+ <h2>Totaux</h2><div class="tot" id="tot"></div>
+ <h2>Ajouter un invité</h2>
+ <div class="box"><input id="gn" placeholder="Nom de l’invité"><select id="gg"></select><button id="add">Ajouter et créer son lien</button><div id="aerr" class="err"></div></div>
+ <h2>Invités et liens personnels</h2><div id="gl"></div>
+ <h2>Réponses reçues</h2><div id="rl"></div>
+ <h2>Tables et tenues</h2><div id="ge"></div><button id="sg">Enregistrer les groupes</button> <span id="gm"></span>
+
+ <h2>Mon compte</h2>
+ <div class="box"><p id="who"></p>
+  <input id="np" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password"><button id="cp">Changer mon mot de passe</button><div id="pm" role="status"></div></div>
+ <div class="box"><b>Supprimer mon compte</b>
+  <p>Efface définitivement mon mariage, mes invités, les réponses et mes photos. Cette action est irréversible.</p>
+  <input id="dc" placeholder="Tapez SUPPRIMER pour confirmer"><button id="del" class="danger">Supprimer mon compte</button><div id="dm" class="err" role="alert"></div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const sb=supabase.createClient("https://bdrcnwxrjuwwefspemnm.supabase.co","sb_publishable_updtYL5csEVjxQwaGTazbw_hI-BEUwO");
+const $=id=>document.getElementById(id),v=id=>$(id).value.trim();
+const slugify=n=>n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+function el(t,txt,cls){const e=document.createElement(t);if(txt!=null)e.textContent=txt;if(cls)e.className=cls;return e}
+let EVT=null,G=[],GS=[],RS=[],UID=null,signup=false;
+
+/* ---------- Connexion, création de compte ---------- */
+$("mode").onclick=()=>{signup=!signup;$("lt").textContent=signup?"Créer mon compte":"Connexion";$("go").textContent=signup?"Créer mon compte":"Se connecter";
+  $("mode").textContent=signup?"J’ai déjà un compte : me connecter":"Pas encore de compte ? Créer un compte";$("pw").autocomplete=signup?"new-password":"current-password";$("lerr").textContent=""};
+$("go").onclick=async()=>{const email=v("em"),password=$("pw").value;$("lerr").className="err";
+  if(!email||password.length<8){$("lerr").textContent="Indiquez un e-mail et un mot de passe de 8 caractères minimum.";return}
+  if(signup){const {data,error}=await sb.auth.signUp({email,password});
+    if(error){$("lerr").textContent="Création impossible : "+error.message;return}
+    if(!data.session){$("lerr").className="ok";$("lerr").textContent="Compte créé. Vérifiez votre e-mail pour confirmer, puis connectez-vous.";return}
+  }else{const {error}=await sb.auth.signInWithPassword({email,password});
+    if(error){$("lerr").textContent="E-mail ou mot de passe incorrect.";return}}
+  start()};
+$("forgot").onclick=async()=>{if(!v("em")){$("lerr").textContent="Écrivez d’abord votre e-mail ci-dessus.";return}
+  const {error}=await sb.auth.resetPasswordForEmail(v("em"),{redirectTo:location.origin+location.pathname});
+  $("lerr").className=error?"err":"ok";$("lerr").textContent=error?"Envoi impossible : "+error.message:"Un e-mail pour changer votre mot de passe vous a été envoyé."};
+sb.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY"){$("login").hidden=true;$("app").hidden=true;$("rec").hidden=false}});
+$("rgo").onclick=async()=>{if($("rp").value.length<8){$("rerr").textContent="8 caractères minimum.";return}
+  const {error}=await sb.auth.updateUser({password:$("rp").value});if(error){$("rerr").textContent=error.message;return}$("rec").hidden=true;start()};
+$("out").onclick=async()=>{await sb.auth.signOut();start()};
+
+async function start(){const {data}=await sb.auth.getSession(),s=data.session;
+  $("login").hidden=!!s;$("app").hidden=!s;if(!s){EVT=null;return}
+  UID=s.user.id;$("who").textContent="Connecté : "+s.user.email;await boot()}
+async function boot(){
+  let r=await sb.from("events").select("*").maybeSingle();
+  if(!r.data){const c=await sb.rpc("create_my_event");if(c.error){$("em2").textContent="Création du mariage impossible : "+c.error.message;return}
+    r=await sb.from("events").select("*").maybeSingle()}
+  EVT=r.data;if(!EVT)return;EVT.photos=Array.isArray(EVT.photos)?EVT.photos:[];fillEvent();await load()}
+
+/* ---------- Invités, réponses, groupes ---------- */
+async function load(){
+  const [g,gs,rs]=await Promise.all([sb.from("groups").select("*").eq("event_id",EVT.id).order("sort"),sb.from("guests").select("*").eq("event_id",EVT.id).order("created_at"),sb.from("rsvps").select("*").eq("event_id",EVT.id).order("created_at")]);
+  G=g.data||[];GS=gs.data||[];RS=rs.data||[];draw()}
+const base=()=>new URL("./",location.href).href+(EVT.style||"")+"?e="+EVT.slug;
+function draw(){
+  const yes=RS.filter(r=>r.attending),no=RS.filter(r=>!r.attending),seen=new Set(RS.map(r=>r.slug));
+  const pend=GS.filter(x=>!seen.has(x.slug)).length,pers=yes.reduce((a,r)=>a+(r.count||0),0);
+  $("tot").innerHTML="";[["Invités",GS.length],["Confirmés",yes.length],["Personnes",pers],["Refus",no.length],["Sans réponse",pend]].forEach(([k,n])=>{const d=el("div",k);d.prepend(el("b",n));$("tot").appendChild(d)});
+  $("gg").innerHTML="";G.forEach(g=>{const o=el("option",g.label);o.value=g.id;$("gg").appendChild(o)});
+  $("gen").textContent="";const gb=el("button","Copier le lien général de l’invitation","l");gb.onclick=()=>navigator.clipboard.writeText(base()).then(()=>gb.textContent="Lien copié");$("gen").appendChild(gb);
+  $("gl").innerHTML="";
+  GS.forEach(x=>{const r=el("div",null,"row"),d=el("div");d.appendChild(el("b",x.name));
+    const rv=RS.find(q=>q.slug===x.slug);d.appendChild(document.createTextNode(rv?(rv.attending?"a confirmé":"a refusé"):"sans réponse"));
+    const bt=el("div");const c=el("button","Copier le lien","l");c.onclick=()=>navigator.clipboard.writeText(base()+"#"+x.slug).then(()=>c.textContent="Lien copié");
+    const x2=el("button","Supprimer","l");x2.onclick=async()=>{if(!confirm("Supprimer "+x.name+" ?"))return;await sb.from("guests").delete().eq("event_id",EVT.id).eq("slug",x.slug);await sb.from("rsvps").delete().eq("event_id",EVT.id).eq("slug",x.slug);load()};
+    bt.append(c," ",x2);r.append(d,bt);$("gl").appendChild(r)});
+  $("rl").innerHTML="";RS.forEach(r=>{const w=el("div",null,"row"),d=el("div");d.appendChild(el("b",r.name));
+    d.appendChild(document.createTextNode(r.attending?(r.group_label+" · "+r.table_name+" · "+r.count+" pers."):"Ne viendra pas"));w.appendChild(d);$("rl").appendChild(w)});
+  $("ge").innerHTML="";G.forEach(g=>{const b=el("div",null,"box");b.appendChild(el("b",g.label));
+    const t=el("input"),d=el("input");t.value=g.table_name;d.value=g.dress;t.dataset.id=d.dataset.id=g.id;t.dataset.k="table_name";d.dataset.k="dress";b.append(t,d);$("ge").appendChild(b)})}
+$("add").onclick=async()=>{const n=v("gn"),sl=slugify(n);if(!sl){$("aerr").textContent="Nom invalide.";return}
+  const {error}=await sb.from("guests").insert({event_id:EVT.id,slug:sl,name:n,group_id:$("gg").value});
+  $("aerr").textContent=error?"Impossible d’ajouter (nom déjà utilisé ?).":"";if(!error){$("gn").value="";load()}};
+$("sg").onclick=async()=>{const by={};document.querySelectorAll("#ge input").forEach(i=>{(by[i.dataset.id]??={})[i.dataset.k]=i.value.trim()});
+  for(const id in by) await sb.from("groups").update(by[id]).eq("event_id",EVT.id).eq("id",id);$("gm").textContent="Enregistré.";load()};
+$("csv").onclick=()=>{const q=x=>'"'+String(x??"").replace(/"/g,'""')+'"';
+  const rows=[["Nom","Groupe","Table","Personnes","Présence"],...RS.map(r=>[r.name,r.group_label,r.table_name,r.count,r.attending?"oui":"non"])];
+  const a=el("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(q).join(";")).join("\n")],{type:"text/csv"}));a.download="invites.csv";a.click()};
+$("sty").onchange=async()=>{EVT.style=$("sty").value;await sb.from("events").update({style:EVT.style}).eq("id",EVT.id);draw()};
+
+/* ---------- Informations du mariage ---------- */
+function fillEvent(){const E=EVT;$("sty").value=E.style||"";
+  $("eb").value=E.bride||"";$("eg").value=E.groom||"";$("ed").value=E.event_date||"";$("ev").value=E.venue||"";$("ea").value=E.address||"";$("ec").value=E.city||"";$("edl").value=E.deadline||"";
+  $("c1n").value=E.contact1_name||"";$("c1p").value=E.contact1_phone||"";$("c2n").value=E.contact2_name||"";$("c2p").value=E.contact2_phone||"";
+  $("pg").value=(E.program||[]).map(p=>[p.t,p.title,p.desc].join(" | ")).join("\n");drawPh()}
+function drawPh(){$("pl").innerHTML="";EVT.photos.forEach((u,i)=>{const w=el("div",null,"th"),im=el("img");im.src=u;im.alt="Photo "+(i+1);const b=el("button","Retirer","l");b.onclick=()=>{EVT.photos.splice(i,1);drawPh()};w.append(im,b);$("pl").appendChild(w)})}
+async function shrink(f){try{const bm=await createImageBitmap(f),r=Math.min(1,1400/Math.max(bm.width,bm.height)),c=document.createElement("canvas");c.width=Math.round(bm.width*r);c.height=Math.round(bm.height*r);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);return await new Promise(ok=>c.toBlob(ok,"image/jpeg",.85))}catch(e){return f}}
+$("pi").onchange=async e=>{$("em2").className="";$("em2").textContent="Envoi des photos…";let fail=0;
+  for(const f of e.target.files){const blob=await shrink(f),path=UID+"/"+Date.now()+"-"+Math.random().toString(36).slice(2,8)+".jpg";
+    const {error}=await sb.storage.from("photos").upload(path,blob,{contentType:"image/jpeg"});
+    if(error){fail++;$("em2").textContent="Envoi impossible : "+error.message}else EVT.photos.push(sb.storage.from("photos").getPublicUrl(path).data.publicUrl)}
+  drawPh();if(!fail)$("em2").textContent="Photos ajoutées. Pensez à enregistrer.";e.target.value=""};
+$("se").onclick=async()=>{if(!v("ed")){$("em2").className="err";$("em2").textContent="Indiquez la date et l’heure du mariage.";return}
+  const prog=v("pg").split("\n").map(l=>l.split("|").map(x=>x.trim())).filter(a=>a[0]).map(a=>({t:a[0],title:a[1]||"",desc:a[2]||""}));
+  const upd={bride:v("eb"),groom:v("eg"),event_date:v("ed"),venue:v("ev"),address:v("ea"),city:v("ec"),deadline:v("edl"),
+    contact1_name:v("c1n"),contact1_phone:v("c1p"),contact2_name:v("c2n"),contact2_phone:v("c2p"),program:prog,photos:EVT.photos,updated_at:new Date().toISOString()};
+  const {error}=await sb.from("events").update(upd).eq("id",EVT.id);
+  $("em2").className=error?"err":"ok";$("em2").textContent=error?"L’enregistrement a échoué. Détail : "+error.message+(error.code?" (code "+error.code+")":""):"Informations enregistrées.";
+  if(!error)Object.assign(EVT,upd)};
+
+/* ---------- Mon compte ---------- */
+$("cp").onclick=async()=>{if($("np").value.length<8){$("pm").className="err";$("pm").textContent="8 caractères minimum.";return}
+  const {error}=await sb.auth.updateUser({password:$("np").value});$("pm").className=error?"err":"ok";$("pm").textContent=error?error.message:"Mot de passe changé.";if(!error)$("np").value=""};
+$("del").onclick=async()=>{if(v("dc")!=="SUPPRIMER"){$("dm").textContent="Tapez SUPPRIMER pour confirmer.";return}
+  try{const {data}=await sb.storage.from("photos").list(UID,{limit:500});if(data&&data.length)await sb.storage.from("photos").remove(data.map(f=>UID+"/"+f.name))}catch(e){}
+  const {error}=await sb.rpc("delete_my_account");if(error){$("dm").textContent="Suppression impossible : "+error.message;return}
+  await sb.auth.signOut();await start();$("lerr").className="ok";$("lerr").textContent="Votre compte et toutes ses données ont été supprimés."};
+start();
+</script></main></body></html>
